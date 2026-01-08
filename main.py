@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from database import engine
 from models import Base
-from routes import events, rsvps  # import routers
+from routes import events, rsvps  
 
 Base.metadata.create_all(bind=engine)
 
