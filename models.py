@@ -1,4 +1,3 @@
-# models.py
 from sqlalchemy import Column, Integer, String, Text, DateTime, ForeignKey
 from sqlalchemy.orm import relationship
 from database import Base
@@ -12,10 +11,9 @@ class Event(Base):
     description = Column(Text, nullable=True)
     date = Column(DateTime, nullable=False)
     location = Column(String, nullable=False)
-    flyer = Column(String, nullable=True)
+    flyer_filename = Column(String, nullable=True)
 
-    
-    rsvps = relationship("RSVP", back_populates="event", cascade="all, delete-orphan")
+    rsvps = relationship("RSVP", back_populates="event", cascade="all, delete")
 
 class RSVP(Base):
     __tablename__ = "rsvps"
@@ -23,7 +21,8 @@ class RSVP(Base):
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String, nullable=False)
     email = Column(String, nullable=False)
-    event_id = Column(Integer, ForeignKey("events.id")) 
 
-    
+    event_id = Column(Integer, ForeignKey("events.id"), nullable=False)
+
     event = relationship("Event", back_populates="rsvps")
+

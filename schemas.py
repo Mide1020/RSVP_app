@@ -1,6 +1,20 @@
 from pydantic import BaseModel
-from datetime import date
 from typing import Optional, List
+from datetime import datetime
+
+class EventBase(BaseModel):
+    title: str
+    description: Optional[str] = None
+    date: datetime
+    location: str
+    flyer_filename: Optional[str] = None
+
+class EventResponse(EventBase):
+    id: int
+
+    model_config = {
+        "from_attributes": True  
+    }
 
 class RSVPBase(BaseModel):
     name: str
@@ -8,23 +22,8 @@ class RSVPBase(BaseModel):
 
 class RSVPResponse(RSVPBase):
     id: int
-
-    class Config:
-        orm_mode = True
-
-
-class EventBase(BaseModel):
-    title: str
-    description: Optional[str] = None
-    date: date
-    location: str
-
-class EventResponse(EventBase):
-    id: int
-    flyer: Optional[str]
-    rsvps: List[RSVPResponse] = []
+    event_id: int
 
     model_config = {
         "from_attributes": True
     }
-

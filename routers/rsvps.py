@@ -1,9 +1,12 @@
 from fastapi import APIRouter, Form, Depends
 from sqlalchemy.orm import Session
 from database import SessionLocal
-import crud, schemas
+from models import RSVP
+from schemas import RSVPResponse
+from typing import List
 
 router = APIRouter(prefix="/events", tags=["RSVPs"])
+
 
 def get_db():
     db = SessionLocal()
@@ -12,15 +15,19 @@ def get_db():
     finally:
         db.close()
 
-@router.post("/{event_id}/rsvp", response_model=schemas.RSVPResponse)
+@router.post("/{event_id}/rsvp", response_model=RSVPResponse)
 def rsvp_event(
     event_id: int,
     name: str = Form(...),
     email: str = Form(...),
     db: Session = Depends(get_db)
 ):
-    return crud.create_rsvp(db, event_id, name, email)
+    rsvp = RSVP(name=name, email=email, event_id=event_id)
+    db.add(rsvp)
+    db.commit()
+    db.refresh(rsvp)
+    return rsvp
 
-@router.get("/{event_id}/rsvps", response_model=list[schemas.RSVPResponse])
+@router.get("/{event_id}/rsvps", response_model=List[RSVPResponse])
 def get_rsvps(event_id: int, db: Session = Depends(get_db)):
-    return crud.get_event_rsvps(db, event_id)
+    return db.query(RSVP).filter(RSVP.event_id == event_id).all()
